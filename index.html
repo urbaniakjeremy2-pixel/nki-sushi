@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NKI Sushi - Commande</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f8f8f8;
+}
+
+header {
+    background: #111;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+h2 {
+    margin-top: 30px;
+}
+
+.product {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+button {
+    background: #e60023;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #c4001d;
+}
+
+.section {
+    margin-top: 20px;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
+}
+
+.success {
+    color: green;
+    margin-top: 15px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>NKI Sushi</h1>
+</header>
+
+<div class="container">
+
+    <h2>Menu</h2>
+
+    <div class="product">
+        <span>Sushi Saumon - 6€</span>
+        <button onclick="addToCart('Sushi Saumon', 6)">Ajouter</button>
+    </div>
+
+    <div class="product">
+        <span>California Thon - 7€</span>
+        <button onclick="addToCart('California Thon', 7)">Ajouter</button>
+    </div>
+
+    <h2>Panier</h2>
+    <ul id="cartList"></ul>
+    <p><strong>Total : <span id="total">0</span> €</strong></p>
+
+    <div class="section">
+        <h2>Choix des sauces</h2>
+
+        <label><input type="checkbox" class="sauce" value="Sucrée"> Sucrée</label><br>
+        <label><input type="checkbox" class="sauce" value="Salée"> Salée</label><br>
+        <label><input type="checkbox" class="sauce" value="Aigre douce"> Aigre douce</label><br>
+        <label><input type="checkbox" class="sauce" value="Wasabi"> Wasabi</label><br>
+        <label><input type="checkbox" class="sauce" value="Gingembre"> Gingembre</label><br>
+        <label><input type="checkbox" id="noneSauce"> Aucune</label>
+    </div>
+
+    <div class="section">
+        <h2>Nombre de baguettes</h2>
+        <select id="baguettes">
+            <option value="">-- Choisir --</option>
+            <option value="1">1 paire</option>
+            <option value="2">2 paires</option>
+            <option value="3">3 paires</option>
+            <option value="4">4+ paires</option>
+        </select>
+    </div>
+
+    <button style="margin-top:20px;" onclick="validateOrder()">Valider la commande</button>
+
+    <p class="error" id="errorMsg"></p>
+    <p class="success" id="successMsg"></p>
+
+</div>
+
+<script>
+let cart = [];
+let total = 0;
+
+function addToCart(name, price) {
+    cart.push({name, price});
+    total += price;
+    updateCart();
+}
+
+function updateCart() {
+    const cartList = document.getElementById("cartList");
+    const totalSpan = document.getElementById("total");
+    cartList.innerHTML = "";
+
+    cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.name + " - " + item.price + "€";
+        cartList.appendChild(li);
+    });
+
+    totalSpan.textContent = total;
+}
+
+const noneSauce = document.getElementById("noneSauce");
+const sauceCheckboxes = document.querySelectorAll(".sauce");
+
+noneSauce.addEventListener("change", () => {
+    if (noneSauce.checked) {
+        sauceCheckboxes.forEach(s => s.checked = false);
+    }
+});
+
+sauceCheckboxes.forEach(s => {
+    s.addEventListener("change", () => {
+        if (s.checked) {
+            noneSauce.checked = false;
+        }
+    });
+});
+
+function validateOrder() {
+    const errorMsg = document.getElementById("errorMsg");
+    const successMsg = document.getElementById("successMsg");
+    errorMsg.textContent = "";
+    successMsg.textContent = "";
+
+    if (cart.length === 0) {
+        errorMsg.textContent = "Votre panier est vide.";
+        return;
+    }
+
+    const saucesSelected = [...sauceCheckboxes].filter(s => s.checked);
+    const baguettes = document.getElementById("baguettes").value;
+
+    if (!noneSauce.checked && saucesSelected.length === 0) {
+        errorMsg.textContent = "Veuillez choisir au moins une sauce ou sélectionner 'Aucune'.";
+        return;
+    }
+
+    if (!baguettes) {
+        errorMsg.textContent = "Veuillez choisir le nombre de baguettes.";
+        return;
+    }
+
+    successMsg.textContent = "Commande validée avec succès ! 🎉";
+}
+</script>
+
+</body>
+</html>
